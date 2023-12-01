@@ -64,4 +64,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function details()
+    {
+        return $this->hasOne(UserDetails::class);
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(UserWallet::class);
+    }
+
+    public function plan()
+    {
+        return $this->hasOne(Plan::class);
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(Deposits::class);
+    }
+
+    public static function getUserInfo(){
+        return User::with(['plan','deposits','details','wallet']);
+    }
 }

@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('deposits', function (Blueprint $table) {
             $table->increments('id');
-			$table->integer('user_id');
+			$table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
 			$table->string('reference_id', 100)->nullable()->default('');
 			$table->float('amount')->nullable()->default(00.0);
             $table->date('date')->nullable();

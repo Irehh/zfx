@@ -29,22 +29,25 @@ Route::post('/login', [ AuthController::class, 'login']);
  
  //protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/products', function (){
-        return 'welldone';
-    });
+    
     Route::post('/auth/login', [ AuthController::class, 'userlogin']);
     Route::put('/auth/register', [ AuthController::class, 'register']);
     Route::delete('/products/{id}', [ ProductController::class, 'destroy']);
     Route::post('/logout', [ AuthController::class, 'logout']);
 
-    Route::prefix('admin')->group(function() {
-
+    Route::group(['prefix' => '/admin', 'middleware' => ['auth', 'admin']], function () {
+        
     });
 
-    Route::prefix('user')->group(function() {
-        Route::post('/deposit', [ UserController::class, 'deposit']);
-        Route::post('/profile', [ UserController::class, 'profile']);
-        Route::post('/change-password', [ AuthController::class, 'change-password']);
+    Route::group(['prefix' => '/user', 'middleware' => ['auth', 'user']], function () {
+        return "welcome";
+        // Route::get('/profile', [ UserController::class, 'profile']);
     });
+
+    // Route::prefix('user')->group(function() {
+    //     Route::post('/deposit', [ UserController::class, 'deposit']);
+    //     
+    //     Route::post('/change-password', [ AuthController::class, 'change-password']);
+    // });
 
 });

@@ -14,55 +14,55 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-    $fields = $request->validate([
-        'name' => 'required|string|min:2',
-        'email' => 'required|string|unique:users,email',
-        'referrer' => 'string',
-        'password' => 'required|string|confirmed|min:6',
-    ]);
+        $fields = $request->validate([
+            'name' => 'required|string|min:2',
+            'email' => 'required|string|unique:users,email',
+            'referrer' => 'string',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
 
-    // Generate a unique slug based on the user's name
-    $slug = Str::slug($fields['name']);
+        // Generate a unique slug based on the user's name
+        $slug = Str::slug($fields['name']);
 
-    // Ensure slug uniqueness
-    $count = User::where('slug', $slug)->count();
-    if ($count > 0) {
+        // Ensure slug uniqueness
+        $count = User::where('slug', $slug)->count();
+        if ($count > 0) {
         $slug = $slug . '-' . ($count + 1); // Append a number to make it unique
-    }
+        }
 
-    // Generate a unique referral code
-    do {
-        $uuid = (string) Str::uuid();
-        $referralCode = substr($uuid, 0, 6);
-    } while (User::where('referral_code', $referralCode)->exists());
+        // Generate a unique referral code
+        do {
+            $uuid = (string) Str::uuid();
+            $referralCode = substr($uuid, 0, 6);
+        } while (User::where('referral_code', $referralCode)->exists());
 
-    $fields['referral_code'] = $referralCode;
-    // Create the user
-    $user = User::create([
-        'name' => $fields['name'],
-        'email' => $fields['email'],
-        'referrer' => $fields['referrer'],
-        'password' => Hash::make($fields['password']),
-        'status' => 'active',
-        'slug' => $slug,
-        'referral_code' => $fields['referral_code'],
-    ]);
+        $fields['referral_code'] = $referralCode;
+        // Create the user
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'referrer' => $fields['referrer'],
+            'password' => Hash::make($fields['password']),
+            'status' => 'active',
+            'slug' => $slug,
+            'referral_code' => $fields['referral_code'],
+        ]);
 
-    // Store user ID in the session instead of email
-    Session::put('user_id', $user->id);
+        // Store user ID in the session instead of email
+        Session::put('user_id', $user->id);
 
-    // Return a JSON response
-    if ($user) {
-        $response = [
-            'success' => 'Successfully registered',
-            'user' => $user,
-        ];
-    } else {
-        $response = [
-            'error' => 'Please try again!',
-        ];
-    }
-    return response()->json($response, $user ? 201 : 400);
+        // Return a JSON response
+        if ($user) {
+            $response = [
+                'success' => 'Successfully registered',
+                'user' => $user,
+            ];
+        } else {
+            $response = [
+                'error' => 'Please try again!',
+            ];
+        }
+        return response()->json($response, $user ? 201 : 400);
     }
     //this is the first initial authentication for the api i.e who can access it
     public function login (Request $request)
@@ -99,7 +99,11 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
-                $user = User::where('email', $fields['email'])->first();
+                // $user = User::where('email', $fields['email'])->first();
+                if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password'], 'status' => 'active'])) {
+                    // Successfully logged in
+                    Session::put('user', $fields['email']);
+                } 
 
                 if(!$user || !Hash::check($fields['password'], $user->password)) 
                 {
