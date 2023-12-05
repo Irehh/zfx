@@ -9,10 +9,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserWallet extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
+    
+    protected $table = 'user_wallets';
 
-    protected $fillable = [
-        'wallet_type',
-        'wallet_address'
-    ];
+
+    // protected $fillable = [
+    //     'user_id',
+    //     'wallet_type',
+    //     'wallet_address',
+    //     'profit',
+    //     'referal_bonus',
+    //     'trading_bonus',
+    //     'balance'
+
+    // ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

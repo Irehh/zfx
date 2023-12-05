@@ -17,12 +17,10 @@ use App\Http\Controllers\ProductController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
 //public routes
 
-Route::post('/products/{id}', [ ProductController::class, 'show']);
+Route::post('/products/products/search/register', [ AuthController::class, 'apiregister']);
 Route::get('/products/search/{name}', [ ProductController::class, 'search']); 
 
 Route::post('/login', [ AuthController::class, 'login']);
@@ -35,19 +33,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/products/{id}', [ ProductController::class, 'destroy']);
     Route::post('/logout', [ AuthController::class, 'logout']);
 
-    Route::group(['prefix' => '/admin', 'middleware' => ['auth', 'admin']], function () {
+    
         
-    });
-
-    Route::group(['prefix' => '/user', 'middleware' => ['auth', 'user']], function () {
-        return "welcome";
-        // Route::get('/profile', [ UserController::class, 'profile']);
-    });
-
-    // Route::prefix('user')->group(function() {
-    //     Route::post('/deposit', [ UserController::class, 'deposit']);
-    //     
-    //     Route::post('/change-password', [ AuthController::class, 'change-password']);
-    // });
+       
 
 });
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    
+Route::get('/user/profile', [ AuthController::class, 'profile']);
+
+});
+
+// Route::group(['middleware' => ['auth:sanctum', 'SecondAuthenticationMiddleware:user']], function () {
+//     // Routes that require both authentications and admin role
+//     Route::get('user/profile', [ UserController::class, 'profile']);
+// });

@@ -9,6 +9,9 @@ class Plan extends Model
 {
     use HasFactory;
 
+	protected $table = 'plans';
+
+
     protected $fillable = [
 		'plan_name',
 		'daily_percentage',

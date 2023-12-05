@@ -3,10 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+
 
 
 class User extends Authenticatable
@@ -21,29 +24,19 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'first_name',
         'email',
-        'email_verified_at',
-        'password',
         'remember_token',
         'slug',
-        'last_name',
-        'city',
         'phone_verified',
         'document_verified',
-        'country',
         'balance',
         'blocked_at',
-        'photo',
         'role',
         'provider',
         'provider_id',
         'status',
         'referral_code',
-        'referrer',
-        'profile_image',
-        'verification_document',
-        'phone_number',
+        'referrer'
     ];
 
     /**
@@ -65,27 +58,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function details()
+    public function UserDetails()
     {
         return $this->hasOne(UserDetails::class);
     }
-
-    public function wallet()
+ 
+    public function UserWallet()
     {
         return $this->hasOne(UserWallet::class);
     }
 
-    public function plan()
-    {
-        return $this->hasOne(Plan::class);
-    }
-
-    public function deposits()
+    public function Deposits()
     {
         return $this->hasMany(Deposits::class);
     }
 
     public static function getUserInfo(){
-        return User::with(['plan','deposits','details','wallet']);
+        return User::with(['Deposits','UserDetails','UserWallet']);
     }
 }

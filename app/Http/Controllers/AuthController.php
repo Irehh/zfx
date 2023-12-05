@@ -6,11 +6,38 @@ use App\Models\User;
 use App\Models\Apiusers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
+
+    public function apiregister (Request $request)
+    {
+        $fields =$request->validate(
+            [
+                'name' => 'required|string',
+                'email' => 'required|string|unique:users,email',
+                'password' => 'required|string|confirmed',
+            ]);
+
+            $user = Apiusers::create(
+                [
+                    'name' => $fields['name'],
+                    'email' => $fields['email'],
+                    'password' => bcrypt($fields['password'])
+                ]);
+
+        $token = $user->createToken('myapptoken')->plainTextToken;
+        $response = 
+        [
+            'user' =>$user,
+            'token' =>$token
+        ];
+
+         return response($response, 201);
+    }
 
     public function register(Request $request)
     {
@@ -47,9 +74,7 @@ class AuthController extends Controller
             'slug' => $slug,
             'referral_code' => $fields['referral_code'],
         ]);
-
-        // Store user ID in the session instead of email
-        Session::put('user_id', $user->id);
+        $token = $user->createToken('myapptoken')->plainTextToken;
 
         // Return a JSON response
         if ($user) {
@@ -91,37 +116,92 @@ class AuthController extends Controller
     }
     //this is the function that is called when user wants to login i.e not api user but api user customers login
     //normal customer login
-    public function userlogin (Request $request)
+    // public function userlogin (Request $request)
+    // {
+    //     $fields =$request->validate(
+    //         [
+    //             'email' => 'required|string',
+    //             'password' => 'required|string',
+    //         ]);
+
+    //             $user = User::where('email', $fields['email'])->first();
+
+    //             if(!$user || !Hash::check($fields['password'], $user->password)) 
+    //             {
+    //                 return response (['message' => 'bad credentials'], 401);
+    //             }
+
+    //     $response = 
+    //     [
+    //         'status' => 'successfully logged in',
+    //     ];
+
+    //      return response($response, 201);
+    // }
+
+        public function userlogin(Request $request)
     {
-        $fields =$request->validate(
-            [
-                'email' => 'required|string',
-                'password' => 'required|string',
-            ]);
+        $fields = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-                // $user = User::where('email', $fields['email'])->first();
-                if (Auth::attempt(['email' => $fields['email'], 'password' => $fields['password'], 'status' => 'active'])) {
-                    // Successfully logged in
-                    Session::put('user', $fields['email']);
-                } 
+        $user = User::where('email', $fields['email'])->where('role', 'user')->first();
 
-                if(!$user || !Hash::check($fields['password'], $user->password)) 
-                {
-                    return response (['message' => 'bad credentials'], 401);
-                }
+        if (!$user || !Hash::check($fields['password'], $user->password)) {
+            return response(['message' => 'Bad credentials'], 401);
+        }
 
-        $response = 
-        [
-            'status' => 'successfully logged in',
+        // Check if the user already has an existing token
+        $existingToken = $user->tokens()->first();
+
+        if ($existingToken) {
+            // If an existing token is available, use it
+            $token = $existingToken->plainTextToken;
+        } else {
+            // If no existing token, create a new one
+            $token = $user->createToken('myapptoken')->plainTextToken;
+        }
+
+        $response = [
+            'user' => $user,
+            'token' => $token,
         ];
 
-         return response($response, 201);
+        return response($response, 200);
     }
+
     //logout for api access
     public function logout (Request $request){
             auth()->user()->tokens()->delete();
             return [
                 'message' => 'logged out',
             ];
+    }
+
+    public function profile()
+    {
+        // Retrieve the authenticated user
+        $user = auth::user();
+            $userInfo = User::getUserInfo()->find($user->id);
+        
+        if ($user) {
+            // Load relationships
+            // $user->load('details', 'wallet','deposits');
+
+            // // You can customize the data you want to return in the response
+            // $data = [
+            //     'user' => $user,
+            //     'user_detail' => $user->details,
+            //     'user_wallet' => $user->wallet,
+            //     'deposits' => $user->deposits
+                
+            // ];
+
+
+            return response()->json(['status' => 'success', 'user' => $userInfo], 200);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
     }
 }

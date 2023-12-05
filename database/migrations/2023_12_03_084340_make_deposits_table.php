@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
+        
         Schema::create('deposits', function (Blueprint $table) {
             $table->increments('id');
 			$table->unsignedBigInteger('user_id');

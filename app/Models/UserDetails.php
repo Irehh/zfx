@@ -11,7 +11,10 @@ class UserDetails extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $table = 'user_details';
+
     protected $fillable = [
+        'user_id',
         'last_name',
         'first_name',
         'city',
@@ -21,4 +24,9 @@ class UserDetails extends Model
         'profile_image',
         'phone_number'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -3,9 +3,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class User
+class SecondAuthenticationMiddleware
 {
     /**
      * Handle an incoming request.
@@ -14,20 +16,13 @@ class User
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $role)
     {
-        if($request->user()->role=='user'){
+        if(Auth::check() && Auth::User->role===$role){
             return $next($request);
         }
         else{
             return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        if(empty(session('user'))){
-            return response()->json(['error' => 'Sign Up'], 401);
-        }
-        else{
-            return $next($request);
         }
     }
 }
