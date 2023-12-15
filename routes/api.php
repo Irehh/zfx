@@ -21,7 +21,7 @@ use App\Http\Controllers\UserController;
 
 //public routes
 
-Route::post('/products/products/search/register', [ AuthController::class, 'apiregister']);
+Route::post('david/register', [ AuthController::class, 'apiregister']);
 Route::get('/products/search/{name}', [ ProductController::class, 'search']); 
 
 Route::post('/login', [ AuthController::class, 'login']);
@@ -33,17 +33,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/auth/register', [ AuthController::class, 'register']);
     Route::delete('/products/{id}', [ ProductController::class, 'destroy']);
     Route::post('/logout', [ AuthController::class, 'logout']);
-
-    
-        
-       
-
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     
 Route::get('/user/profile', [ UserController::class, 'profile']);
-Route::post('/user/update', [ UserController::class, 'profileUpdate']);
+Route::get('/user/{slug}', [ UserController::class, 'showProfile']);
+Route::put('/user/profile-update/{slug}', [ UserController::class, 'updateProfile']);
 
 });
 
