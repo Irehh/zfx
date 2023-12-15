@@ -31,6 +31,7 @@ class User extends Authenticatable
         'document_verified',
         'balance',
         'blocked_at',
+        'password',
         'role',
         'provider',
         'provider_id',

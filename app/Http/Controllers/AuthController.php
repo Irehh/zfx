@@ -81,6 +81,7 @@ class AuthController extends Controller
             $response = [
                 'success' => 'Successfully registered',
                 'user' => $user,
+                'token' => $token
             ];
         } else {
             $response = [
@@ -151,17 +152,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response(['message' => 'Bad credentials'], 401);
         }
-
-        // Check if the user already has an existing token
-        $existingToken = $user->tokens()->first();
-
-        if ($existingToken) {
-            // If an existing token is available, use it
-            $token = $existingToken->plainTextToken;
-        } else {
-            // If no existing token, create a new one
             $token = $user->createToken('myapptoken')->plainTextToken;
-        }
 
         $response = [
             'user' => $user,
@@ -179,29 +170,5 @@ class AuthController extends Controller
             ];
     }
 
-    public function profile()
-    {
-        // Retrieve the authenticated user
-        $user = auth::user();
-            $userInfo = User::getUserInfo()->find($user->id);
-        
-        if ($user) {
-            // Load relationships
-            // $user->load('details', 'wallet','deposits');
-
-            // // You can customize the data you want to return in the response
-            // $data = [
-            //     'user' => $user,
-            //     'user_detail' => $user->details,
-            //     'user_wallet' => $user->wallet,
-            //     'deposits' => $user->deposits
-                
-            // ];
-
-
-            return response()->json(['status' => 'success', 'user' => $userInfo], 200);
-        } else {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-    }
+    
 }

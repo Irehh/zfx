@@ -11,19 +11,18 @@ class UserWallet extends Model
 {
     use HasFactory;
     
-    protected $table = 'user_wallets';
+    protected $table = 'user_wallet';
 
 
-    // protected $fillable = [
-    //     'user_id',
-    //     'wallet_type',
-    //     'wallet_address',
-    //     'profit',
-    //     'referal_bonus',
-    //     'trading_bonus',
-    //     'balance'
+    protected $fillable = [
+        'wallet_type',
+        'wallet_address',
+        'profit',
+        'referal_bonus',
+        'trading_bonus',
+        'balance'
 
-    // ];
+    ];
 
     public function user()
     {

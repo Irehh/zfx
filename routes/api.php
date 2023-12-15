@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     
-Route::get('/user/profile', [ AuthController::class, 'profile']);
+Route::get('/user/profile', [ UserController::class, 'profile']);
+Route::post('/user/update', [ UserController::class, 'profileUpdate']);
 
 });
 
